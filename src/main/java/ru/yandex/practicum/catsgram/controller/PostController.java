@@ -36,14 +36,6 @@ public class PostController {
     }
 
     // вспомогательный метод для генерации идентификатора нового поста
-    private long getNextId() {
-        long currentMaxId = posts.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
-    }
 
     @PutMapping
     public Post update(@RequestBody Post newPost) {
@@ -62,4 +54,14 @@ public class PostController {
         }
         throw new NotFoundException("Пост с id = " + newPost.getId() + " не найден");
     }
+
+    private long getNextId() {
+        long currentMaxId = posts.keySet()
+                .stream()
+                .mapToLong(id -> id)
+                .max()
+                .orElse(0);
+        return ++currentMaxId;
+    }
+
 }
