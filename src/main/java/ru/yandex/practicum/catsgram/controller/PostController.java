@@ -3,6 +3,7 @@ package ru.yandex.practicum.catsgram.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.catsgram.exception.ParameterNotValidException;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.service.PostService;
 
@@ -20,8 +21,8 @@ public class PostController {
     @GetMapping
     public Collection<Post> findAll(
             @RequestParam(defaultValue = "asc", required = false) String sort,
-            @RequestParam(defaultValue = "0", required = false) int size,
-            @RequestParam(defaultValue = "0", required = false) int from) {
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) Integer from) {
         return postService.findAll(sort, size, from);
     }
 

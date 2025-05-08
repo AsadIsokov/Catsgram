@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
+import ru.yandex.practicum.catsgram.exception.ParameterNotValidException;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.model.User;
 
@@ -17,19 +18,30 @@ public class PostService {
     private final Map<Long, Post> posts = new HashMap<>();
     private final UserService userService;
 
-    public Collection<Post> findAll(String sort, int size, int from) {
+    public Collection<Post> findAll(String sort, Integer size, Integer from) {
+        if(!"asc".equals(sort) && !"desc".equals(sort) && !"descending".equals(sort)){
+            throw new ParameterNotValidException(
+                    String.format("%s", sort),
+                    "Некорректное значение сортировки. Значение должно быть: asc или desc или descending"
+            );
+        }
+        if(size <= 0){
+            throw new ParameterNotValidException(
+                    String.format("%s", size),
+                    "Некорректный размер выборки. Размер должен быть больше нуля"
+            );
+        }
+        if(from < 0){
+            throw new ParameterNotValidException(
+                    String.format("%s", from),
+                    "Некорректное значение параметра from. Значение не может быть меньше нуля"
+            );
+        }
         List<Post> sortedPostList = posts.values().stream()
                 .sorted(Comparator.comparing(Post::getPostDate))
                 .collect(Collectors.toList());
         if (SortOrder.sortCategory(sort).equals(SortOrder.DESCENDING)) {
             Collections.reverse(sortedPostList);
-        }
-        if (from == 0 && size == 0 && sortedPostList.size() > 10){
-            return sortedPostList.stream()
-                    .skip(sortedPostList.size() - 10)
-                    .collect(Collectors.toList());
-        } else if (size < 10) {
-            return sortedPostList;
         }
         if (from + size < sortedPostList.size()) {
             return sortedPostList.stream()
